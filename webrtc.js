@@ -1,9 +1,7 @@
 async function webRtcTest(testName, testId, twoWay, replacement) {
 
-  createRow(testName, testId);
-
-  const info = logInfo.bind(null, testId);
-  const error = logError.bind(null, testId);
+  const {info, error} = useLog(testId);
+  const {updateCreatorState, updateJoinerState} = createRow(testName, testId);
 
   const creatorPc = new RTCPeerConnection();
 
@@ -12,7 +10,7 @@ async function webRtcTest(testName, testId, twoWay, replacement) {
     creatorPc.oniceconnectionstatechange = function (e) {
       const iceState = creatorPc.iceConnectionState
       info("Creator state:", iceState);
-      document.getElementById(testId + "-creator").innerText = iceState;
+      updateCreatorState(iceState);
     }
 
     creatorPc.onicecandidateerror = function (e) {
@@ -47,7 +45,7 @@ async function webRtcTest(testName, testId, twoWay, replacement) {
     joinerPc.oniceconnectionstatechange = function (e) {
       const iceState = joinerPc.iceConnectionState
       info("Joiner state:", iceState);
-      document.getElementById(testId + "-joiner").innerText = iceState;
+      updateJoinerState(iceState);
     }
 
     joinerPc.onicecandidateerror = function (e) {

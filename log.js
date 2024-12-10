@@ -1,23 +1,28 @@
-function appendLogLine(prefix, ...args) {
-  const logArea = document.getElementById('logArea');
-  const timestamp = new Date().toLocaleTimeString();
-  const message = args.map(a => {
-    if (typeof a === 'object') {
-      return JSON.stringify(a);
-    }
-    return String(a);
-  }).join(' ');
+function useLog(testId) {
 
-  logArea.value += `[${timestamp}] ${prefix}${message}\n`;
-  logArea.scrollTop = logArea.scrollHeight;
-}
+  function appendLogLine(prefix, ...args) {
+    const logArea = document.getElementById('logArea');
+    const timestamp = new Date().toLocaleTimeString();
+    const message = args.map(a => {
+      if (typeof a === 'object') {
+        return JSON.stringify(a);
+      }
+      return String(a);
+    }).join(' ');
 
-function logInfo(testId, ...args) {
-  appendLogLine(`[${testId}] [INFO] `, ...args);
-}
+    logArea.value += `[${timestamp}] ${prefix}${message}\n`;
+    logArea.scrollTop = logArea.scrollHeight;
+  }
 
-function logError(testId, ...args) {
-  appendLogLine(`[${testId}] [ERROR] `, ...args);
+  function info(...args) {
+    appendLogLine(`[${testId}] [INFO] `, ...args);
+  }
+
+  function error(...args) {
+    appendLogLine(`[${testId}] [ERROR] `, ...args);
+  }
+
+  return {info, error}
 }
 
 async function copyLog() {
@@ -25,8 +30,8 @@ async function copyLog() {
   const copyMsg = document.getElementById('copyMsg');
   try {
     await navigator.clipboard.writeText(textToCopy);
-    copyMsg.innerText = "copied!";
+    copyMsg.textContent = "copied!";
   } catch (err) {
-    copyMsg.innerText = "error!";
+    copyMsg.textContent = "error!";
   }
 }
