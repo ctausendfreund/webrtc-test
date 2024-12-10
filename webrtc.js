@@ -1,4 +1,7 @@
-async function webRtcTest() {
+async function webRtcTest(testId, twoWay) {
+
+  const info = logInfo.bind(null, testId);
+  const error = logError.bind(null, testId);
 
   const creatorPc = new RTCPeerConnection();
 
@@ -7,6 +10,7 @@ async function webRtcTest() {
     creatorPc.oniceconnectionstatechange = function (e) {
       const iceState = creatorPc.iceConnectionState
       info("Creator state changed:", iceState);
+      document.getElementById(testId + "-creator").innerText = iceState;
     }
 
     creatorPc.onicecandidateerror = function (e) {
@@ -38,6 +42,7 @@ async function webRtcTest() {
     joinerPc.oniceconnectionstatechange = function (e) {
       const iceState = joinerPc.iceConnectionState
       info("Joiner state changed:", iceState);
+      document.getElementById(testId + "-joiner").innerText = iceState;
     }
 
     joinerPc.onicecandidateerror = function (e) {
@@ -70,11 +75,14 @@ async function webRtcTest() {
     info("offer:\n", offer);
     const answer = await createAnswer(offer);
     info("answer:", answer);
-    await creatorPc.setRemoteDescription(answer);
+    if (twoWay) {
+      await creatorPc.setRemoteDescription(answer);
+    }
   } catch (e) {
     error("something went wrong:", e);
   }
 
 }
 
-webRtcTest();
+webRtcTest("n1w", false);
+webRtcTest("n2w", true);

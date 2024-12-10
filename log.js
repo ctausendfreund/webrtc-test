@@ -12,12 +12,12 @@ function appendLogLine(prefix, ...args) {
   logArea.scrollTop = logArea.scrollHeight;
 }
 
-function info(...args) {
-  appendLogLine('[INFO] ', ...args);
+function logInfo(testId, ...args) {
+  appendLogLine(`[${testId}] [INFO] `, ...args);
 }
 
-function error(...args) {
-  appendLogLine('[ERROR] ', ...args);
+function logError(testId, ...args) {
+  appendLogLine(`[${testId}] [ERROR] `, ...args);
 }
 
 async function copyLog() {
