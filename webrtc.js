@@ -1,4 +1,6 @@
-async function webRtcTest(testId, twoWay) {
+async function webRtcTest(testName, testId, twoWay, replacement) {
+
+  createRow(testName, testId);
 
   const info = logInfo.bind(null, testId);
   const error = logError.bind(null, testId);
@@ -9,7 +11,7 @@ async function webRtcTest(testId, twoWay) {
 
     creatorPc.oniceconnectionstatechange = function (e) {
       const iceState = creatorPc.iceConnectionState
-      info("Creator state changed:", iceState);
+      info("Creator state:", iceState);
       document.getElementById(testId + "-creator").innerText = iceState;
     }
 
@@ -20,6 +22,9 @@ async function webRtcTest(testId, twoWay) {
     const dc = creatorPc.createDataChannel("");
     dc.onopen = function (e) {
       info("Creator data channel opened");
+    }
+    dc.onerror = function (e) {
+      error("Creator data channel onerror", e);
     }
 
     await creatorPc.setLocalDescription(); // creates the offer
@@ -41,7 +46,7 @@ async function webRtcTest(testId, twoWay) {
 
     joinerPc.oniceconnectionstatechange = function (e) {
       const iceState = joinerPc.iceConnectionState
-      info("Joiner state changed:", iceState);
+      info("Joiner state:", iceState);
       document.getElementById(testId + "-joiner").innerText = iceState;
     }
 
@@ -50,8 +55,12 @@ async function webRtcTest(testId, twoWay) {
     }
 
     joinerPc.ondatachannel = function (e) {
-      e.channel.onopen = function (e) {
+      const dc = e.channel;
+      dc.onopen = function (e) {
         info("Joiner data channel opened");
+      }
+      dc.onerror = function (e) {
+        error("Joiner data channel onerror", e);
       }
     }
 
@@ -71,8 +80,12 @@ async function webRtcTest(testId, twoWay) {
   }
 
   try {
-    const offer = await createOffer();
-    info("offer:\n", offer);
+    let offer = await createOffer();
+    info("original offer:", offer);
+    if (replacement) {
+      offer = replaceCandidateHostnamesWith(offer, replacement);
+      info("modified offer:", offer);
+    }
     const answer = await createAnswer(offer);
     info("answer:", answer);
     if (twoWay) {
@@ -84,5 +97,9 @@ async function webRtcTest(testId, twoWay) {
 
 }
 
-webRtcTest("n1w", false);
-webRtcTest("n2w", true);
+webRtcTest("normal 1 way","n1w", false, "");
+webRtcTest("normal 2 way","n2w", true, "");
+webRtcTest("127.0.0.1 1 way","l4-1w", false, "127.0.0.1");
+webRtcTest("127.0.0.1 2 way","l4-2w", true,"127.0.0.1");
+webRtcTest("::1 1 way","l6-1w", false, "::1");
+webRtcTest("::1 2 way","l6-2w", true, "::1");
