@@ -1,4 +1,4 @@
-async function webRtcTest(testName, testId, twoWay, replacement) {
+async function webRtcTest(testName, testId, twoWay, replacement, replaceWithLocalAddresses) {
 
   const {info, error} = useLog(testId);
   const {updateCreatorState, updateJoinerState} = createRow(testName, testId);
@@ -80,12 +80,19 @@ async function webRtcTest(testName, testId, twoWay, replacement) {
   try {
     let offer = await createOffer();
     info("original offer:", offer);
+
     if (replacement) {
       offer = replaceCandidateHostnamesWith(offer, replacement);
       info("modified offer:", offer);
+    } else if (replaceWithLocalAddresses) {
+      const localAddresses = await findLocalAddresses();
+      offer = replaceCandidateAddressesCrossMultiplied(offer, localAddresses);
+      info("modified offer:", offer);
     }
+
     const answer = await createAnswer(offer);
     info("answer:", answer);
+
     if (twoWay) {
       await creatorPc.setRemoteDescription(answer);
     }
@@ -95,9 +102,25 @@ async function webRtcTest(testName, testId, twoWay, replacement) {
 
 }
 
-webRtcTest("normal 1 way","n1w", false, "");
-webRtcTest("normal 2 way","n2w", true, "");
-webRtcTest("127.0.0.1 1 way","l4-1w", false, "127.0.0.1");
-webRtcTest("127.0.0.1 2 way","l4-2w", true,"127.0.0.1");
-webRtcTest("::1 1 way","l6-1w", false, "::1");
-webRtcTest("::1 2 way","l6-2w", true, "::1");
+async function logLocalAddresses(testId) {
+  const {info} = useLog(testId);
+  const localAddresses = await findLocalAddresses();
+  localAddresses.forEach(a => info(a));
+}
+
+(async function () {
+  await logLocalAddresses("local addresses test 1");
+  await logLocalAddresses("local addresses test 2");
+
+  await webRtcTest("normal 1 way", "n1w", false, "", false);
+  await webRtcTest("normal 2 way", "n2w", true, "", false);
+
+  await webRtcTest("127.0.0.1 1 way", "l4-1w", false, "127.0.0.1", false);
+  await webRtcTest("127.0.0.1 2 way", "l4-2w", true, "127.0.0.1", false);
+
+  await webRtcTest("::1 1 way", "l6-1w", false, "::1", false);
+  await webRtcTest("::1 2 way", "l6-2w", true, "::1", false);
+
+  await webRtcTest("local cross 1 way", "c1w", false, "", true);
+  await webRtcTest("local cross 2 way", "c2w", true, "", true);
+})();

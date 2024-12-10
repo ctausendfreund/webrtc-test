@@ -20,6 +20,7 @@ function useLog(testId) {
 
   function error(...args) {
     appendLogLine(`[${testId}] [ERROR] `, ...args);
+    console.error(...args);
   }
 
   return {info, error}
