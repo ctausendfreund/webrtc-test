@@ -109,6 +109,8 @@ async function logLocalAddresses(testId) {
 }
 
 (async function () {
+  useLog("user agent").info(window.navigator.userAgent);
+
   await logLocalAddresses("local addresses test 1");
   await logLocalAddresses("local addresses test 2");
 
