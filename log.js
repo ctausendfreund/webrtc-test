@@ -28,11 +28,11 @@ function useLog(testId) {
 
 async function copyLog() {
   const textToCopy = document.getElementById('logArea').value;
-  const copyMsg = document.getElementById('copyMsg');
+  const result = document.getElementById('result');
   try {
     await navigator.clipboard.writeText(textToCopy);
-    copyMsg.textContent = "copied!";
+    result.textContent = "copied!";
   } catch (err) {
-    copyMsg.textContent = "error!";
+    result.textContent = "error!";
   }
 }

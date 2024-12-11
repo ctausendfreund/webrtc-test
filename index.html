@@ -23,10 +23,15 @@
 <br>
 
 <div>
-    <button onclick="copyLog()">Copy Log</button>&nbsp;<span id="copyMsg"></span><br/>
+    <button onclick="copyLog()">Copy Log</button>
+    <button onclick="submitToJsonBin()">Upload to jsonbin</button>
+    &nbsp;
+    <span id="result"></span>
+    <br/>
     <textarea id="logArea" readonly></textarea>
 </div>
 
+<script src="jsonbin.js"></script>
 <script src="log.js"></script>
 <script src="table-utils.js"></script>
 <script src="webrtc-utils.js"></script>
