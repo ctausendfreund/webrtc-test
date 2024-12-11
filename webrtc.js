@@ -123,6 +123,15 @@ async function logLocalAddresses(testId) {
   await webRtcTest("::1 1 way", "l6-1w", false, "::1", false);
   await webRtcTest("::1 2 way", "l6-2w", true, "::1", false);
 
+  await webRtcTest("192.0.0.4 1 way", "192-4-1w", false, "192.0.0.4", false);
+  await webRtcTest("192.0.0.4 2 way", "192-4-2w", true, "192.0.0.4", false);
+
+  await webRtcTest("192.0.0.6 1 way", "192-6-1w", false, "192.0.0.6", false);
+  await webRtcTest("192.0.0.6 2 way", "192-6-2w", true, "192.0.0.6", false);
+
+  await webRtcTest("localhost 1 way", "lo-1w", false, "localhost", false);
+  await webRtcTest("localhost 2 way", "lo-2w", true, "localhost", false);
+
   await webRtcTest("local cross 1 way", "c1w", false, "", true);
   await webRtcTest("local cross 2 way", "c2w", true, "", true);
 })();

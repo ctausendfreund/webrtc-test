@@ -38,3 +38,7 @@ th {
 tr:hover td {
     background: #f8f8f8;
 }
+
+table tr:nth-child(even) {
+    color: gray;
+}
