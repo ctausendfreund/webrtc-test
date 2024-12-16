@@ -1,4 +1,4 @@
-async function webRtcTest(testName, testId, twoWay, replacement, replaceWithLocalAddresses) {
+async function webRtcTest(testName, testId, twoWay, replacement, replaceWithLocalAddresses, replaceWithLocalAndLocalhostAddresses) {
 
   const {info, error} = useLog(testId);
   const {updateCreatorState, updateJoinerState} = createRow(testName, testId);
@@ -88,6 +88,12 @@ async function webRtcTest(testName, testId, twoWay, replacement, replaceWithLoca
       const localAddresses = await findLocalAddresses();
       offer = replaceCandidateAddressesCrossMultiplied(offer, localAddresses);
       info("modified offer:", offer);
+    } else if (replaceWithLocalAndLocalhostAddresses) {
+      const localAddresses = await findLocalAddresses();
+      localAddresses.add("127.0.0.1");
+      localAddresses.add("::1");
+      offer = replaceCandidateAddressesCrossMultiplied(offer, localAddresses);
+      info("modified offer:", offer);
     }
 
     const answer = await createAnswer(offer);
@@ -134,4 +140,7 @@ async function logLocalAddresses(testId) {
 
   await webRtcTest("local cross 1 way", "c1w", false, "", true);
   await webRtcTest("local cross 2 way", "c2w", true, "", true);
+
+  await webRtcTest("local & 127.0.0.1 & ::1 1 way", "cl-1w", false, "", false, true);
+  await webRtcTest("local & 127.0.0.1 & ::1 2 way", "cl-2w", true, "", false, true);
 })();
